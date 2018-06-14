@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -45,8 +47,16 @@ public class BLEListAdapter extends RecyclerView.Adapter<BLEListAdapter.MyViewHo
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
-        holder.tvMac.setText(mDeviceList.get(position).getBleAddress());
+    public void onBindViewHolder(MyViewHolder holder, final int position) {
+        holder.tvMac.setText(mDeviceList.get(position).getBleName()  + "\n" + mDeviceList.get(position).getBleAddress());
+        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(mListCheckBoxSelectorListener != null){
+                    mListCheckBoxSelectorListener .onSelected(mDeviceList.get(position), position ,isChecked);
+                }
+            }
+        });
     }
 
 
@@ -54,10 +64,12 @@ public class BLEListAdapter extends RecyclerView.Adapter<BLEListAdapter.MyViewHo
 
 //        @BindView(R.id.tv_mac)
         TextView tvMac;
+        CheckBox checkBox;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             tvMac = (TextView)itemView.findViewById(R.id.tv_mac);
+            checkBox = (CheckBox)itemView.findViewById(R.id.cb_select);
         }
 
     }
@@ -67,6 +79,22 @@ public class BLEListAdapter extends RecyclerView.Adapter<BLEListAdapter.MyViewHo
         mDeviceList.addAll(list);
         mListSize = mDeviceList.size();
         notifyDataSetChanged();
+    }
+
+
+    public static abstract class ListCheckBoxSelectorListener implements CompoundButton.OnCheckedChangeListener{
+
+        public abstract void onSelected(BleDevice bleDevice, int position, boolean isChecked);
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+        }
+    }
+
+    private ListCheckBoxSelectorListener mListCheckBoxSelectorListener  = null;
+    public void setOnSelectListener(ListCheckBoxSelectorListener listener){
+        mListCheckBoxSelectorListener = listener;
     }
 
 

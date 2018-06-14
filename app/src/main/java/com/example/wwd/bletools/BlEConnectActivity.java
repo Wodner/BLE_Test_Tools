@@ -37,6 +37,7 @@ public class BlEConnectActivity extends AppCompatActivity implements EasyPermiss
     private List<BleDevice> mDevicesList = new ArrayList<>();
     private BLEListAdapter mBLEListAdapter = null;
 
+    private List<BleDevice> mConnectLists = new ArrayList<>();
 
 
 
@@ -45,7 +46,9 @@ public class BlEConnectActivity extends AppCompatActivity implements EasyPermiss
 
     private final int RC_LOACTION = 123;
 
-    private Ble mBle;
+    private Ble mBle = null;
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,9 +58,6 @@ public class BlEConnectActivity extends AppCompatActivity implements EasyPermiss
 
 
         initBle();
-        mBLEListAdapter = new BLEListAdapter(this);
-
-
         //设置RecyclerView管理器
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         //初始化适配器
@@ -67,7 +67,7 @@ public class BlEConnectActivity extends AppCompatActivity implements EasyPermiss
         //设置适配器
         mRecyclerView.setAdapter(mBLEListAdapter);
         mBLEListAdapter.setData(mDevicesList);
-
+        mBLEListAdapter.setOnSelectListener(mListCheckBoxSelectorListener);
     }
 
     @Override
@@ -77,13 +77,11 @@ public class BlEConnectActivity extends AppCompatActivity implements EasyPermiss
             mBle.turnOnBlueToothNo();
         }
         checkPermission();
-
     }
 
     public static void startAction(Context context, Bundle bundle) {
         Intent intent = new Intent(context, BlEConnectActivity.class);
         context.startActivity(intent);
-
     }
 
 
@@ -101,7 +99,24 @@ public class BlEConnectActivity extends AppCompatActivity implements EasyPermiss
         mBle.init(getApplicationContext(), options);
     }
 
-    private
+    private BLEListAdapter.ListCheckBoxSelectorListener mListCheckBoxSelectorListener = new BLEListAdapter.ListCheckBoxSelectorListener() {
+        @Override
+        public void onSelected(BleDevice bleDevice, int position, boolean isCheck) {
+            Log.d(TAG,isCheck  + "   " + position);
+            if(isCheck){
+                if(!mConnectLists.contains(bleDevice)){
+                    mConnectLists.add(bleDevice);
+                }
+            }else{
+                if(mConnectLists.contains(bleDevice)){
+                    mConnectLists.remove(bleDevice);
+                }
+            }
+            for(int i=0; i<mConnectLists.size(); i++){
+                Log.d(TAG,TAG + mConnectLists.get(i).getBleAddress());
+            }
+        }
+    };
 
     BleScanCallback<BleDevice> scanCallback = new BleScanCallback<BleDevice>() {
         @Override
