@@ -7,10 +7,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,8 +34,14 @@ public class BlEConnectActivity extends AppCompatActivity implements EasyPermiss
 
     private final String TAG = "BlEConnectActivity";
 
+    private List<BleDevice> mDevicesList = new ArrayList<>();
+    private BLEListAdapter mBLEListAdapter = null;
+
+
+
+
     @BindView(R.id.listview)
-    RecyclerView listview;
+    RecyclerView mRecyclerView;
 
     private final int RC_LOACTION = 123;
 
@@ -46,10 +55,18 @@ public class BlEConnectActivity extends AppCompatActivity implements EasyPermiss
 
 
         initBle();
+        mBLEListAdapter = new BLEListAdapter(this);
 
 
-
-
+        //设置RecyclerView管理器
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        //初始化适配器
+        mBLEListAdapter = new BLEListAdapter(this);
+        //设置添加或删除item时的动画，这里使用默认动画
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        //设置适配器
+        mRecyclerView.setAdapter(mBLEListAdapter);
+        mBLEListAdapter.setData(mDevicesList);
 
     }
 
@@ -84,16 +101,20 @@ public class BlEConnectActivity extends AppCompatActivity implements EasyPermiss
         mBle.init(getApplicationContext(), options);
     }
 
+    private
+
     BleScanCallback<BleDevice> scanCallback = new BleScanCallback<BleDevice>() {
         @Override
         public void onLeScan(final BleDevice device, int rssi, byte[] scanRecord) {
-            Toast.makeText(BlEConnectActivity.this, "ssss", Toast.LENGTH_SHORT).show();
-            Log.d(TAG,""+device.getBleName());
+            Toast.makeText(BlEConnectActivity.this, "mac:" + device.getBleAddress(), Toast.LENGTH_SHORT).show();
             synchronized (mBle.getLocker()) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
+                        if (!mDevicesList.contains(device)) {
+                            mDevicesList.add(device);
+                            mBLEListAdapter.setData(mDevicesList);
+                        }
                     }
                 });
             }

@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
+import cn.com.heaton.blelibrary.ble.BleDevice;
 
 /**
  * Created by WWD on 2018/6/11.
@@ -19,7 +19,7 @@ import butterknife.BindView;
 public class BLEListAdapter extends RecyclerView.Adapter<BLEListAdapter.MyViewHolder> {
 
     private Context mContext = null;
-    private List<String> mDeviceList = new ArrayList<>();
+    private List<BleDevice>  mDeviceList = new ArrayList<>();
     private int mListSize = 0;
 
     public BLEListAdapter(Context context) {
@@ -46,22 +46,23 @@ public class BLEListAdapter extends RecyclerView.Adapter<BLEListAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        holder.tvMac.setText(mDeviceList.get(position));
+        holder.tvMac.setText(mDeviceList.get(position).getBleAddress());
     }
 
 
     class MyViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.tv_mac)
+//        @BindView(R.id.tv_mac)
         TextView tvMac;
 
         public MyViewHolder(View itemView) {
             super(itemView);
+            tvMac = (TextView)itemView.findViewById(R.id.tv_mac);
         }
 
     }
 
-    public void setData(List<String> list){
+    public void setData(List<BleDevice> list){
         mDeviceList.clear();
         mDeviceList.addAll(list);
         mListSize = mDeviceList.size();
