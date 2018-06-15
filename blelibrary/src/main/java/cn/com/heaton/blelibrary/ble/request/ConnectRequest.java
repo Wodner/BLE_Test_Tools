@@ -73,6 +73,9 @@ public class ConnectRequest<T extends BleDevice> implements IMessage {
      * @param device 设备对象
      */
     public void disconnect(BleDevice device) {
+        if(mDevices!= null){
+            mDevices.clear();
+        }
         BluetoothLeService service = Ble.getInstance().getBleService();
         if (service != null) {
             service.disconnect(device.getBleAddress());

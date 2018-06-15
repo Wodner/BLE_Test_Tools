@@ -55,6 +55,7 @@ public class BleListAdapter extends RecyclerView.Adapter<BleListAdapter.MyViewHo
 //        }else{
 //            holder.checkBox.setEnabled(true);
 //        }
+        holder.checkBox.setChecked(false);
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

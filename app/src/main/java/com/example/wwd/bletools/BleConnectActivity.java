@@ -43,6 +43,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
     private List<BleDevice> mDevicesList = new ArrayList<>();//扫描设备列表
     private BleListAdapter mBleListAdapter = null;
     private List<BleDevice> mToConnectLists = new ArrayList<>();//需要连接的设备
+    private int mConnectedDeivceSize = 0;
 
 
     @BindView(R.id.listview)
@@ -86,6 +87,11 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
             @Override
             public void onConnected(List<BleDevice> deviceList, int size) {
                 Log.d(TAG,"连接设备数 ： " + size);
+                if(mConnectedDeivceSize != size){
+                    mConnectedDeivceSize = size;
+                    Toast.makeText(BleConnectActivity.this,"连接设备数：" + size,Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
     }
@@ -144,6 +150,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
         mDevicesList.clear();
         mBleListAdapter.setData(mDevicesList);
         mBle.stopScan();
+        mBleManager.clearConnectQueue();
         checkPermission();
     }
 
@@ -234,7 +241,9 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
                 mBleManager.startConnect();
                 break;
             case R.id.btn_disconnect:
+                mConnectedDeivceSize = 0;
                 mBleManager.disConnect();
+                mBleListAdapter.setData(mDevicesList);
                 break;
         }
     }

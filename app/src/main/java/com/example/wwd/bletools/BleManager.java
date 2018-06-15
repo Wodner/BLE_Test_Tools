@@ -38,10 +38,11 @@ public class BleManager {
                 if(instance == null){
                     instance = new BleManager();
                 }
+                return  instance;
             }
-            return  instance;
+
         }
-        return null;
+        return instance;
     }
 
 
@@ -56,6 +57,7 @@ public class BleManager {
      * @param device
      */
     public void addDeivceToConnectQueen(BleDevice device){
+        Log.d(TAG,"addDeivceToConnectQueen ");
         if(mBleConnectDeviceQueues != null){
             if(!mBleConnectDeviceQueues.contains(device)){
                 mBleConnectDeviceQueues.add(device);
@@ -81,11 +83,18 @@ public class BleManager {
         return mBleConnectDeviceQueues;
     }
 
+    public void clearConnectQueue(){
+        if(mBleConnectDeviceQueues != null){
+            mBleConnectDeviceQueues.clear();
+        }
+    }
+
 
     /**
      * @param device 添加已连接的设备到断开连接的队列
      */
     private void addDeviceToDisconnectQueue(BleDevice device){
+        Log.d(TAG,"addDeviceToDisconnectQueue");
         if(mBleDisconnectDeviceQueues != null){
             if(!mBleDisconnectDeviceQueues.contains(device)){
                 mBleDisconnectDeviceQueues.add(device);
@@ -101,6 +110,8 @@ public class BleManager {
         clearConenctedDevices();
         if(mBleConnectDeviceQueues != null && mBleConnectDeviceQueues.size()>0){
             triggerConnectNextDevice();
+        }else{
+            Log.e(TAG,"ConnectDeviceQueues IS NULL OR ConnectDeviceQueues SIEZE IS ZERO!!!");
         }
     }
 
@@ -114,6 +125,7 @@ public class BleManager {
         }
         triggerDisconnectNextDevice();
         clearConenctedDevices();
+
     }
 
     private void clearConenctedDevices(){
@@ -132,7 +144,13 @@ public class BleManager {
         if (bleDevice != null){
             Log.i( TAG,"Start trigger disconnect device : " + bleDevice.getBleAddress());
             mBle.disconnect(bleDevice);
+            mBle.refreshDeviceCache(bleDevice.getBleAddress());
             mBleDisconnectDeviceQueues.remove(bleDevice);
+            try {
+                Thread.sleep(25);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             triggerDisconnectNextDevice();
         }
     }
@@ -162,8 +180,10 @@ public class BleManager {
                     Log.d(TAG, " 已连接， 移除连接队列 ");
                     mBleConnectDeviceQueues.remove(device);
                 }
-                addDeviceToDisconnectQueue(device);
-                mConnectedLists.add(device);
+                if(mBleConnectDeviceQueues.size() != 0){
+                    addDeviceToDisconnectQueue(device);
+                    mConnectedLists.add(device);
+                }
                 if(mOnDevicesConnectListener != null){
                     mOnDevicesConnectListener.onConnected(getConnectedDeviceLists(),mBleDisconnectDeviceQueues.size());
                 }
