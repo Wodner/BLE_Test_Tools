@@ -18,13 +18,14 @@ import cn.com.heaton.blelibrary.ble.BleDevice;
  * Created by WWD on 2018/6/11.
  */
 
-public class BLEListAdapter extends RecyclerView.Adapter<BLEListAdapter.MyViewHolder> {
+public class BleListAdapter extends RecyclerView.Adapter<BleListAdapter.MyViewHolder> {
 
     private Context mContext = null;
     private List<BleDevice>  mDeviceList = new ArrayList<>();
     private int mListSize = 0;
+    private ListCheckBoxSelectorListener mListCheckBoxSelectorListener  = null;
 
-    public BLEListAdapter(Context context) {
+    public BleListAdapter(Context context) {
         mContext = context;
     }
 
@@ -49,6 +50,11 @@ public class BLEListAdapter extends RecyclerView.Adapter<BLEListAdapter.MyViewHo
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         holder.tvMac.setText(mDeviceList.get(position).getBleName()  + "\n" + mDeviceList.get(position).getBleAddress());
+//        if(mDeviceList.get(position).isConnected()){
+//            holder.checkBox.setEnabled(false);
+//        }else{
+//            holder.checkBox.setEnabled(true);
+//        }
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -62,7 +68,6 @@ public class BLEListAdapter extends RecyclerView.Adapter<BLEListAdapter.MyViewHo
 
     class MyViewHolder extends RecyclerView.ViewHolder {
 
-//        @BindView(R.id.tv_mac)
         TextView tvMac;
         CheckBox checkBox;
 
@@ -92,7 +97,7 @@ public class BLEListAdapter extends RecyclerView.Adapter<BLEListAdapter.MyViewHo
         }
     }
 
-    private ListCheckBoxSelectorListener mListCheckBoxSelectorListener  = null;
+
     public void setOnSelectListener(ListCheckBoxSelectorListener listener){
         mListCheckBoxSelectorListener = listener;
     }

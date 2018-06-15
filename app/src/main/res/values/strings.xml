@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">BLETools</string>
+
+    <string name="start_scan">开始扫描BLE设备</string>
+    <string name="need_location_permission">应用需要使用位置权限</string>
+    <string name="permission_grant">权限允许</string>
+    <string name="permission_denied">权限不允许</string>
+
+    <string name="over_max_connect_devices">超过最大连接设备数</string>
+
 </resources>

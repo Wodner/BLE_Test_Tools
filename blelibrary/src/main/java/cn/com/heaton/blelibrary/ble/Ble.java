@@ -3,7 +3,6 @@ package cn.com.heaton.blelibrary.ble;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.os.IBinder;
 
 import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -26,11 +24,11 @@ import cn.com.heaton.blelibrary.ble.callback.BleReadCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleReadRssiCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleScanCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
-import cn.com.heaton.blelibrary.ble.request.ConnectRequest;
 import cn.com.heaton.blelibrary.ble.exception.BleServiceException;
 import cn.com.heaton.blelibrary.ble.proxy.RequestImpl;
 import cn.com.heaton.blelibrary.ble.proxy.RequestLisenter;
 import cn.com.heaton.blelibrary.ble.proxy.RequestProxy;
+import cn.com.heaton.blelibrary.ble.request.ConnectRequest;
 import cn.com.heaton.blelibrary.ble.request.Rproxy;
 import cn.com.heaton.blelibrary.ble.request.ScanRequest;
 
@@ -587,7 +585,7 @@ public class Ble<T extends BleDevice> implements BleLisenter<T>{
         /**
          * 蓝牙扫描周期时长
          */
-        public int scanPeriod = 10 * 1000;
+        public int scanPeriod = 5 * 1000;
         /**
          * 服务绑定失败重试次数
          */

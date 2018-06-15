@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn_connect_bles)
     public void onViewClicked() {
-        BlEConnectActivity.startAction(this,null);
+        BleConnectActivity.startAction(this,null);
+
+//        BleManager.getInstance().writeBytes("hello --------------- ");
     }
 }
