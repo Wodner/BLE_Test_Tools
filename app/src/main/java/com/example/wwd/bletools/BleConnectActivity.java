@@ -1,6 +1,7 @@
 package com.example.wwd.bletools;
 
 import android.Manifest;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,11 +9,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,7 +28,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.com.heaton.blelibrary.ble.Ble;
 import cn.com.heaton.blelibrary.ble.BleDevice;
+import cn.com.heaton.blelibrary.ble.callback.BleConnCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleScanCallback;
+import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -46,6 +51,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
     private int mTotalConnectDevices = 0;
 
 
+
     @BindView(R.id.listview)
     RecyclerView mRecyclerView;
     @BindView(R.id.swipe_refresh)
@@ -61,9 +67,44 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
         ButterKnife.bind(this);
-
-
         initBle();
+        initView();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!mBle.isBleEnable()) {
+            mBle.turnOnBlueToothNo();
+        }
+        clearDevicesList();
+        checkPermission();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mBle.stopScan();
+    }
+
+    private void clearDevicesList(){
+        if(mDevicesList != null){
+            mDevicesList.clear();
+        }
+    }
+
+    public static void startAction(Context context, Bundle bundle) {
+        Intent intent = new Intent(context, BleConnectActivity.class);
+        context.startActivity(intent);
+    }
+
+
+    private void initView(){
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         //设置RecyclerView管理器
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         //初始化适配器
@@ -87,35 +128,12 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
             @Override
             public void onConnected(List<BleDevice> deviceList, int size) {
                 Log.d(TAG,"连接设备数 ： " + size);
-                    Toast.makeText(BleConnectActivity.this,"连接设备数：" + size,Toast.LENGTH_SHORT).show();
+                Toast.makeText(BleConnectActivity.this,"连接设备数：" + size,Toast.LENGTH_SHORT).show();
 
 
             }
         });
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (!mBle.isBleEnable()) {
-            mBle.turnOnBlueToothNo();
-        }
-        mDevicesList.clear();
-        checkPermission();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mBle.stopScan();
-    }
-
-    public static void startAction(Context context, Bundle bundle) {
-        Intent intent = new Intent(context, BleConnectActivity.class);
-        context.startActivity(intent);
-    }
-
-
     /**
      * 初始化
      */
@@ -125,8 +143,8 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
         Ble.Options options = new Ble.Options();
         options.logBleExceptions = true;//设置是否输出打印蓝牙日志
         options.throwBleException = true;//设置是否抛出蓝牙异常
-        options.autoConnect = false;//设置是否自动连接
-        options.scanPeriod = 12 * 1000;//设置扫描时长
+        options.autoConnect = true;//设置是否自动连接
+        options.scanPeriod = 5 * 1000;//设置扫描时长
         options.connectTimeout = 10 * 1000;//设置连接超时时长
         options.uuid_service = Constant.SERVICE_UUID;//设置主服务的uuid
         options.uuid_write_cha = Constant.CHARACTERISTIC_WRITE_UUID;//设置可写特征的uuid
@@ -145,7 +163,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
      * 下拉刷新开始扫描BLE设备
      */
     private void startRefresh() {
-        mDevicesList.clear();
+        clearDevicesList();
         mBleListAdapter.setData(mDevicesList);
         mBle.stopScan();
         mBleManager.clearConnectQueue();
@@ -164,8 +182,14 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
                 return;
             }else{
                 if (isCheck) {
+                    if(!mToConnectLists.contains(bleDevice)){
+                        mToConnectLists.add(bleDevice);
+                    }
                     mBleManager.addDeivceToConnectQueen(bleDevice);
                 } else {
+                    if(mToConnectLists.contains(bleDevice)){
+                        mToConnectLists.remove(bleDevice);
+                    }
                     mBleManager.removeDeviceFormConnectQueen(bleDevice);
                 }
             }
@@ -236,13 +260,31 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_connect:
-                mBleManager.startConnect();
+                if(mBleManager.getConnectQueen().size() > 0){
+                    mBleManager.startConnect();
+                }else {
+                    Toast.makeText(BleConnectActivity.this, "请先选择要连接的设备", Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.btn_disconnect:
-                mTotalConnectDevices = mBleManager.getConnectQueen().size();
-                mBleManager.startDisConnect();
-                mBleListAdapter.setData(mDevicesList);
+                if(mBleManager.getConnectedDeviceLists().size() > 0){
+                    mTotalConnectDevices = mBleManager.getConnectQueen().size();
+                    mBleManager.startDisConnect();
+                    mBleListAdapter.setData(mDevicesList);
+                }else{
+                    Toast.makeText(BleConnectActivity.this,"当前没有连接设备",Toast.LENGTH_LONG).show();
+                }
                 break;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish(); // back button
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

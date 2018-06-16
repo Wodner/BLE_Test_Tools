@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.example.wwd.bletools.MainActivity">
 
 
@@ -15,5 +16,11 @@
         android:text="连接蓝牙设备"/>
 
 
+    <Button
+        android:id="@+id/btn_set_motor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="设置马达震动"/>
 
-</android.support.constraint.ConstraintLayout>
+
+</LinearLayout>

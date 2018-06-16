@@ -783,10 +783,11 @@ public class BluetoothLeService extends Service {
     public static class Options {
 
         public UUID[] uuid_services_extra = new UUID[]{};
-        public UUID uuid_service = UUID.fromString("0000fee9-0000-1000-8000-00805f9b34fb");
-        public UUID uuid_write_cha = UUID.fromString("d44bc439-abfd-45a2-b575-925416129600");
-        public UUID uuid_read_cha = UUID.fromString("d44bc439-abfd-45a2-b575-925416129600");
-        public UUID uuid_notify = UUID.fromString("d44bc439-abfd-45a2-b575-925416129601");
+        public UUID uuid_service = UUID.fromString("6e40fc00-b5a3-f393-e0a9-e50e24dcca9e");
+        public UUID uuid_write_cha = UUID.fromString("6e40fc21-b5a3-f393-e0a9-e50e24dcca9e");
+        public UUID uuid_read_cha = UUID.fromString("6e40fc20-b5a3-f393-e0a9-e50e24dcca9e");
+        public UUID uuid_notify = UUID.fromString("6e40fc20-b5a3-f393-e0a9-e50e24dcca9e");
+
         public UUID uuid_notify_desc = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
         public UUID uuid_ota_service = UUID.fromString("0000fee8-0000-1000-8000-00805f9b34fb");

@@ -30,7 +30,8 @@
 
 
         <activity android:name=".BleConnectActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:label="@string/connect_ble_device">
 
         </activity>
 

@@ -1,11 +1,14 @@
 package com.example.wwd.bletools;
 
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -13,6 +16,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import cn.com.heaton.blelibrary.ble.Ble;
 import cn.com.heaton.blelibrary.ble.BleDevice;
 import cn.com.heaton.blelibrary.ble.callback.BleConnCallback;
+import cn.com.heaton.blelibrary.ble.callback.BleNotiftCallback;
+import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 
 /**
  * Created by WWD on 2018/6/15.
@@ -30,12 +35,11 @@ public class BleManager {
     private BleHandlerThread mBleHandlerThread = null;
     private Handler mBleHandler = null;
 
+    private BleThreadExecutor mExecutor = null;
+
     public BleManager(){
         init();
     }
-
-
-
 
     public static synchronized BleManager getInstance(){
         if(instance == null){
@@ -56,8 +60,12 @@ public class BleManager {
         mBle = Ble.getInstance();
         mBleHandlerThread =  new BleHandlerThread("BleHandlerThread");
         mBleHandlerThread.start();
+        mExecutor = BleThreadExecutor.getInstance();
+        mExecutor.setBleManager(this);
     }
 
+
+    /** ========================  连接与断开 ========start==================================*/
 
     /**
      * @param device
@@ -150,7 +158,6 @@ public class BleManager {
         if(mConnectedLists != null){
             mConnectedLists.clear();
         }
-
     }
 
     /**
@@ -195,6 +202,7 @@ public class BleManager {
             if(mBleConnectDeviceQueues != null){
                 if(device.getConnectionState() == 2505){//connected
                     if(mBleConnectDeviceQueues.contains(device)){
+//                        setNotify(device);
                         Log.d(TAG, " 已连接， 移除出连接队列 ");
                         mBleConnectDeviceQueues.remove(device);
                         mConnectedLists.add(device);
@@ -224,46 +232,111 @@ public class BleManager {
     };
 
 
-
-
-
-
-
-
-
-
-    /**写数据*/
-    public void writeBytes(String data){
-    }
-
-
-
-
-
     public List<BleDevice> getConnectedDeviceLists() {
         return mConnectedLists;
     }
-
-
 
 
     interface OnDevicesConnectListener{
         void onConnected(List<BleDevice> deviceList,int size);
     }
 
+
     public void setOnConnectListener(OnDevicesConnectListener listener){
         mOnDevicesConnectListener = listener;
     }
 
+    /** ========================  连接与断开 ========end==================================*/
 
 
 
 
 
 
+    /**=========================  给设备写数据 ======== start =========================*/
+
+    /**设置马达震动*/
+    public void setVibrationMotor(){
+        Log.d(TAG,"setVibrationMotor");
+        byte [] msg = HexStringUtils.hexString2Bytes("5101");
+        mExecutor.execute(msg);
+    }
+    /**同步时间*/
+    public void setSyncTime(){
+
+    }
+    /**恢复出厂设置*/
+    public void setDeviceReset(){
+
+    }
+
+    /**关机*/
+    public void setPowerOff(){
+
+    }
+
+    /**解绑*/
+    public void setUnbind(){
+
+    }
+
+
+    /**写数据*/
+    public void writeBytes(BleDevice bleDevice,byte[] data){
+        Log.d(TAG,"writeBytes");
+        if(mBle != null){
+            mBle.write(bleDevice, data, new BleWriteCallback() {
+                @Override
+                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                    Log.d(TAG,"onWriteSuccess");
+                }
+            });
+        }
+    }
+
+    /**=========================  给设备写数据 ======== end ========================*/
 
 
 
+    /**=========================  回调数据处理 ======== start ========================*/
+
+
+    private void setNotify(BleDevice  bleDevice){
+        if(mBle != null){
+            mBle.startNotify(bleDevice, new BleNotiftCallback() {
+                @Override
+                public void onChanged(Object device, BluetoothGattCharacteristic characteristic) {
+                    Log.d(TAG,"setNotify , onChanged..... " +  Arrays.toString(characteristic.getValue()));
+                }
+
+                @Override
+                public void onNotifySuccess(BluetoothGatt gatt) {
+                    super.onNotifySuccess(gatt);
+                    Log.d(TAG,"setNotify , onNotifySuccess.....");
+                }
+
+                @Override
+                public void onReady(Object device) {
+                    super.onReady(device);
+                    Log.d(TAG,"setNotify , onReady.....");
+                }
+
+                @Override
+                public void onServicesDiscovered(BluetoothGatt gatt) {
+                    super.onServicesDiscovered(gatt);
+                    Log.d(TAG,"setNotify , onServicesDiscovered.....");
+                }
+
+            });
+        }
+    }
+
+    private void processNotifyData(){
+
+    }
+
+
+    /**=========================  回调数据处理 ======== end ========================*/
 
     class BleHandlerThread extends HandlerThread{
 
@@ -285,15 +358,15 @@ public class BleManager {
     private Handler.Callback mBleHandlerCallback = new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            switch(msg.what){
-                case MSG_CONNECT_BLE_DEVICES:
-                    connect();
-                    break;
-                case MSG_DISCONNECT_BLE_DEVICES:
-                    disconnect();
-                    break;
-            }
-            return false;
+        switch(msg.what){
+            case MSG_CONNECT_BLE_DEVICES:
+                connect();
+                break;
+            case MSG_DISCONNECT_BLE_DEVICES:
+                disconnect();
+                break;
+        }
+        return false;
         }
     };
 
