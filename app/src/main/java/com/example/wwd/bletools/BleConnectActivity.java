@@ -43,7 +43,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
     private List<BleDevice> mDevicesList = new ArrayList<>();//扫描设备列表
     private BleListAdapter mBleListAdapter = null;
     private List<BleDevice> mToConnectLists = new ArrayList<>();//需要连接的设备
-    private int mConnectedDeivceSize = 0;
+    private int mTotalConnectDevices = 0;
 
 
     @BindView(R.id.listview)
@@ -87,10 +87,8 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
             @Override
             public void onConnected(List<BleDevice> deviceList, int size) {
                 Log.d(TAG,"连接设备数 ： " + size);
-                if(mConnectedDeivceSize != size){
-                    mConnectedDeivceSize = size;
                     Toast.makeText(BleConnectActivity.this,"连接设备数：" + size,Toast.LENGTH_SHORT).show();
-                }
+
 
             }
         });
@@ -130,10 +128,10 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
         options.autoConnect = false;//设置是否自动连接
         options.scanPeriod = 12 * 1000;//设置扫描时长
         options.connectTimeout = 10 * 1000;//设置连接超时时长
-        options.uuid_service = UUID.fromString("6E40FC00-B5A3-F393-E0A9-E50E24DCCA9E");//设置主服务的uuid
-        options.uuid_write_cha = UUID.fromString("6E40FC21-B5A3-F393-E0A9-E50E24DCCA9E");//设置可写特征的uuid
-        options.uuid_notify = UUID.fromString("6E40FC20-B5A3-F393-E0A9-E50E24DCCA9E");//设置通知特征的uuid
-        options.uuid_read_cha = UUID.fromString("6E40FC20-B5A3-F393-E0A9-E50E24DCCA9E");//设置可读特征的uuid
+        options.uuid_service = Constant.SERVICE_UUID;//设置主服务的uuid
+        options.uuid_write_cha = Constant.CHARACTERISTIC_WRITE_UUID;//设置可写特征的uuid
+        options.uuid_notify =Constant.CHARACTERISTIC_NOTIFY_UUID;//设置通知特征的uuid
+        options.uuid_read_cha = Constant.CHARACTERISTIC_READ_UUID;//设置可读特征的uuid
         mBle.init(getApplicationContext(), options);
     }
 
@@ -241,8 +239,8 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
                 mBleManager.startConnect();
                 break;
             case R.id.btn_disconnect:
-                mConnectedDeivceSize = 0;
-                mBleManager.disConnect();
+                mTotalConnectDevices = mBleManager.getConnectQueen().size();
+                mBleManager.startDisConnect();
                 mBleListAdapter.setData(mDevicesList);
                 break;
         }

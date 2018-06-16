@@ -10,6 +10,7 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.os.Build;
 import android.os.Message;
+import android.os.ParcelUuid;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 
@@ -51,7 +52,12 @@ public class ScanRequest<T extends BleDevice> implements IMessage {
             mScannerSetting = new ScanSettings.Builder()
                     .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                     .build();
+            ScanFilter scanFilter = new ScanFilter.Builder()
+                    .setDeviceName("M5")
+//                    .setServiceUuid(ParcelUuid.fromString("6E40FC00-B5A3-F393-E0A9-E50E24DCCA9E"))
+                    .build();
             mFilters = new ArrayList<>();
+            mFilters.add(scanFilter);
         }
     }
 

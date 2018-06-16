@@ -1,5 +1,8 @@
 package com.example.wwd.bletools;
 
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -20,10 +23,12 @@ public class BleManager {
     private final static String TAG = "BleManager";
     private static BleManager instance = null;
     private Ble mBle = null;
-    private Queue<BleDevice> mBleConnectDeviceQueues = null;
+    private Queue<BleDevice> mBleConnectDeviceQueues = null;//连接设备队列
     private List<BleDevice> mConnectedLists = new ArrayList<>();//已连接设备列表
-    private Queue<BleDevice> mBleDisconnectDeviceQueues = null;
-
+    private Queue<BleDevice> mBleDisconnectDeviceQueues = null;//断开连接所需要的设备
+    private OnDevicesConnectListener mOnDevicesConnectListener = null;
+    private BleHandlerThread mBleHandlerThread = null;
+    private Handler mBleHandler = null;
 
     public BleManager(){
         init();
@@ -40,7 +45,6 @@ public class BleManager {
                 }
                 return  instance;
             }
-
         }
         return instance;
     }
@@ -50,6 +54,8 @@ public class BleManager {
         mBleConnectDeviceQueues = new ConcurrentLinkedDeque<>();
         mBleDisconnectDeviceQueues = new ConcurrentLinkedDeque<>();
         mBle = Ble.getInstance();
+        mBleHandlerThread =  new BleHandlerThread("BleHandlerThread");
+        mBleHandlerThread.start();
     }
 
 
@@ -69,6 +75,7 @@ public class BleManager {
      * @param device
      */
     public void removeDeviceFormConnectQueen(BleDevice device){
+        Log.d(TAG,"removeDeviceFormConnectQueen ");
         if(mBleConnectDeviceQueues != null){
             if(mBleConnectDeviceQueues.contains(device)){
                 mBleConnectDeviceQueues.remove(device);
@@ -107,6 +114,12 @@ public class BleManager {
      * 开始连接
      */
     public void startConnect(){
+        if(mBleHandler!=null){
+            mBleHandler.sendEmptyMessage(MSG_CONNECT_BLE_DEVICES);
+        }
+    }
+
+    private void connect(){
         clearConenctedDevices();
         if(mBleConnectDeviceQueues != null && mBleConnectDeviceQueues.size()>0){
             triggerConnectNextDevice();
@@ -119,13 +132,18 @@ public class BleManager {
     /**
      * 断开连接
      */
-    public void disConnect(){
+    public void startDisConnect(){
+        if(mBleHandler!=null){
+            mBleHandler.sendEmptyMessage(MSG_DISCONNECT_BLE_DEVICES);
+        }
+    }
+
+    private void disconnect(){
         for(int i=0; i< mConnectedLists.size(); i++){
-            mBleDisconnectDeviceQueues.add(mConnectedLists.get(i));
+            addDeviceToDisconnectQueue(mConnectedLists.get(i));
         }
         triggerDisconnectNextDevice();
         clearConenctedDevices();
-
     }
 
     private void clearConenctedDevices(){
@@ -144,7 +162,6 @@ public class BleManager {
         if (bleDevice != null){
             Log.i( TAG,"Start trigger disconnect device : " + bleDevice.getBleAddress());
             mBle.disconnect(bleDevice);
-            mBle.refreshDeviceCache(bleDevice.getBleAddress());
             mBleDisconnectDeviceQueues.remove(bleDevice);
             try {
                 Thread.sleep(25);
@@ -174,20 +191,23 @@ public class BleManager {
     private BleConnCallback<BleDevice> mBleConnectCallback = new BleConnCallback<BleDevice>() {
         @Override
         public void onConnectionChanged(BleDevice device) {
-            Log.d(TAG, " onConnectionChanged : " + mBleConnectDeviceQueues.size());
+            Log.d(TAG, device.getBleAddress()+" onConnectionChanged : " + device.getConnectionState());
             if(mBleConnectDeviceQueues != null){
-                if(mBleConnectDeviceQueues.contains(device)){
-                    Log.d(TAG, " 已连接， 移除连接队列 ");
-                    mBleConnectDeviceQueues.remove(device);
+                if(device.getConnectionState() == 2505){//connected
+                    if(mBleConnectDeviceQueues.contains(device)){
+                        Log.d(TAG, " 已连接， 移除出连接队列 ");
+                        mBleConnectDeviceQueues.remove(device);
+                        mConnectedLists.add(device);
+                        if(mOnDevicesConnectListener != null){
+                            mOnDevicesConnectListener.onConnected(getConnectedDeviceLists(),mConnectedLists.size());
+                        }
+                        triggerConnectNextDevice();
+                    }
+                }else if(device.getConnectionState() == 2504){//connecting
+                    Log.d(TAG, " 链接中 ");
+                }else{//disconnect
+                    Log.d(TAG, " 未连接 ");
                 }
-                if(mBleConnectDeviceQueues.size() != 0){
-                    addDeviceToDisconnectQueue(device);
-                    mConnectedLists.add(device);
-                }
-                if(mOnDevicesConnectListener != null){
-                    mOnDevicesConnectListener.onConnected(getConnectedDeviceLists(),mBleDisconnectDeviceQueues.size());
-                }
-                triggerConnectNextDevice();
             }
         }
 
@@ -216,12 +236,16 @@ public class BleManager {
     public void writeBytes(String data){
     }
 
+
+
+
+
     public List<BleDevice> getConnectedDeviceLists() {
         return mConnectedLists;
     }
 
 
-    private OnDevicesConnectListener mOnDevicesConnectListener = null;
+
 
     interface OnDevicesConnectListener{
         void onConnected(List<BleDevice> deviceList,int size);
@@ -231,6 +255,47 @@ public class BleManager {
         mOnDevicesConnectListener = listener;
     }
 
+
+
+
+
+
+
+
+
+
+
+    class BleHandlerThread extends HandlerThread{
+
+        public BleHandlerThread(String name){
+            super(name);
+        }
+
+        @Override
+        protected void onLooperPrepared() {
+            super.onLooperPrepared();
+            mBleHandler = new Handler(getLooper(),mBleHandlerCallback);
+        }
+    }
+
+
+    private final int MSG_CONNECT_BLE_DEVICES       = 100;
+    private final int MSG_DISCONNECT_BLE_DEVICES    = 101;
+
+    private Handler.Callback mBleHandlerCallback = new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch(msg.what){
+                case MSG_CONNECT_BLE_DEVICES:
+                    connect();
+                    break;
+                case MSG_DISCONNECT_BLE_DEVICES:
+                    disconnect();
+                    break;
+            }
+            return false;
+        }
+    };
 
 
 
