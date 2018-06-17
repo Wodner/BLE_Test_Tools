@@ -33,6 +33,9 @@ public class BleThreadExecutor {
     }
 
 
+    /**
+     * @param bleManager
+     */
     public void setBleManager(BleManager bleManager){
         this.mBleManager = bleManager;
     }
@@ -48,26 +51,29 @@ public class BleThreadExecutor {
     }
 
 
+    /**
+     * @param chars
+     */
     public void execute(final byte[] chars) {
         Log.d(TAG, "execute start" + mExecutor.getActiveCount());
         try {
             mSemaphore.acquire();
-            for (int i = 0; i < mBleManager.getConnectedDeviceLists().size(); i++) {
-                final BleDevice bleDevice = mBleManager.getConnectedDeviceLists().get(i);
-                mExecutor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                       //write data to ble
-                        try {
-                            if(mBleManager != null){
+            if(mBleManager != null){
+                for (int i = 0; i < mBleManager.getConnectedDeviceLists().size(); i++) {
+                    final BleDevice bleDevice = mBleManager.getConnectedDeviceLists().get(i);
+                    mExecutor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                           //write data to ble
+                            try {
                                 mBleManager.writeBytes(bleDevice,chars);
+                                Thread.sleep(25);
+                            }catch (InterruptedException e){
+                                e.printStackTrace();
                             }
-                            Thread.sleep(25);
-                        }catch (InterruptedException e){
-                            e.printStackTrace();
                         }
-                    }
-                });
+                    });
+                }
             }
             while (mExecutor.getActiveCount() != 0);
             mSemaphore.release();

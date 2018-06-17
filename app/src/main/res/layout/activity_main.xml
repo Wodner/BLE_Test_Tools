@@ -12,15 +12,51 @@
     <Button
         android:id="@+id/btn_connect_bles"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:text="连接蓝牙设备"/>
 
 
     <Button
         android:id="@+id/btn_set_motor"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:text="设置马达震动"/>
 
+    <Button
+        android:id="@+id/btn_sync_time"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="同步时间"/>
+
+    <Button
+        android:id="@+id/btn_get_step"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="读取实时步数"/>
+
+    <Button
+        android:id="@+id/btn_get_heart"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="读取实时心率"/>
+
+    <Button
+        android:id="@+id/btn_device_recover"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="恢复出厂设置"/>
+
+    <Button
+        android:id="@+id/btn_set_off"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="关闭设备"/>
 
 </LinearLayout>

@@ -166,6 +166,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
         clearDevicesList();
         mBleListAdapter.setData(mDevicesList);
         mBle.stopScan();
+        mBleManager.startDisConnect();
         mBleManager.clearConnectQueue();
         checkPermission();
     }

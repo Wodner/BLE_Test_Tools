@@ -1,10 +1,11 @@
 package com.example.wwd.bletools;
 
-import android.bluetooth.BluetoothGattCharacteristic;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -12,9 +13,6 @@ import android.widget.Button;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.com.heaton.blelibrary.ble.Ble;
-import cn.com.heaton.blelibrary.ble.BleDevice;
-import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick({R.id.btn_connect_bles, R.id.btn_set_motor})
+    @OnClick({R.id.btn_connect_bles, R.id.btn_set_motor,R.id.btn_sync_time,R.id.btn_set_off,
+            R.id.btn_get_step,R.id.btn_get_heart,R.id.btn_device_recover})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_connect_bles:
@@ -62,7 +61,87 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_set_motor:
                 BleManager.getInstance().setVibrationMotor();
                 break;
+            case R.id.btn_sync_time:
+                BleManager.getInstance().setSyncTime();
+                break;
+            case R.id.btn_set_off:
+                setDeivcePowerOff();
+                break;
 
+            case R.id.btn_get_step:
+                readStep();
+                break;
+            case R.id.btn_get_heart:
+                readHeart();
+                break;
+            case R.id.btn_device_recover:
+                setDeviceRecovery();
+                break;
         }
     }
+
+
+
+    private void readStep(){
+        BleManager.getInstance().readStep(true);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BleManager.getInstance().readStep(false);;//5s后停止测试
+            }
+        },3000);
+    }
+
+    private void readHeart(){
+        BleManager.getInstance().readHeart(true);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BleManager.getInstance().readHeart(false);//5s后停止测试
+            }
+        },15000);
+    }
+
+
+    private void setDeviceRecovery(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.mipmap.ic_launcher);
+        builder.setTitle("恢复出厂设置");
+        builder.setMessage("是否确认恢复出厂设置?");
+        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                BleManager.getInstance().setDeviceRecovery();
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+    }
+
+    private void setDeivcePowerOff(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.mipmap.ic_launcher);
+        builder.setTitle("关闭设备");
+        builder.setMessage("是否确认关闭?");
+        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                BleManager.getInstance().setPowerOff();
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+    }
+
+
 }

@@ -8,7 +8,6 @@ import android.os.Message;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -202,7 +201,7 @@ public class BleManager {
             if(mBleConnectDeviceQueues != null){
                 if(device.getConnectionState() == 2505){//connected
                     if(mBleConnectDeviceQueues.contains(device)){
-//                        setNotify(device);
+                        setNotify(device);
                         Log.d(TAG, " 已连接， 移除出连接队列 ");
                         mBleConnectDeviceQueues.remove(device);
                         mConnectedLists.add(device);
@@ -232,6 +231,9 @@ public class BleManager {
     };
 
 
+    /**
+     * @return
+     */
     public List<BleDevice> getConnectedDeviceLists() {
         return mConnectedLists;
     }
@@ -242,6 +244,9 @@ public class BleManager {
     }
 
 
+    /**
+     * @param listener
+     */
     public void setOnConnectListener(OnDevicesConnectListener listener){
         mOnDevicesConnectListener = listener;
     }
@@ -261,25 +266,69 @@ public class BleManager {
         byte [] msg = HexStringUtils.hexString2Bytes("5101");
         mExecutor.execute(msg);
     }
+
+    private final int GTM_8 = 28800;
     /**同步时间*/
     public void setSyncTime(){
+        Log.d(TAG,"setSyncTime");
+        int time = (int) System.currentTimeMillis()/1000;
+        byte [] msg =  new byte[12];
+        msg[0] = 0x01;
+        msg[1] = (byte) ((time >> 24)& 0xff);
+        msg[2] = (byte) ((time >> 16)& 0xff);
+        msg[3] = (byte) ((time >> 8) & 0xff);
+        msg[4] = (byte) (time & 0xff);
 
+        msg[5] = (byte) ((GTM_8 >> 24)& 0xff);
+        msg[6] = (byte) ((GTM_8 >> 16)& 0xff);
+        msg[7] = (byte) ((GTM_8 >> 8) & 0xff);
+        msg[8] = (byte) (GTM_8 & 0xff);
+        msg[9] = 0x00;
+        msg[10] = 0x00;
+        msg[11] = 0x01;
+        mExecutor.execute(msg);
     }
-    /**恢复出厂设置*/
-    public void setDeviceReset(){
 
+
+    /**恢复出厂设置*/
+    public void setDeviceRecovery(){
+        Log.d(TAG,"setDeviceRecovery ... ");
+        byte [] msg = HexStringUtils.hexString2Bytes("71010203");
+        mExecutor.execute(msg);
     }
 
     /**关机*/
     public void setPowerOff(){
+        Log.d(TAG,"setPowerOff");
+        byte [] msg = HexStringUtils.hexString2Bytes("AAABAE");
+        mExecutor.execute(msg);
+    }
+
+    /**读取步数*/
+    public void readStep(boolean isOn){
+        Log.d(TAG,"readStep ... ");
+        if(isOn){
+            byte [] msg = HexStringUtils.hexString2Bytes("3101");
+            mExecutor.execute(msg);
+        }else{
+            byte [] msg = HexStringUtils.hexString2Bytes("3100");
+            mExecutor.execute(msg);
+        }
 
     }
 
-    /**解绑*/
-    public void setUnbind(){
 
+    /**读取步数*/
+    public void readHeart(boolean isOn){
+        Log.d(TAG,"readHeart ... " +  isOn);
+        if(isOn){
+            byte [] msg = HexStringUtils.hexString2Bytes("600001");
+            mExecutor.execute(msg);
+        }else{
+            byte [] msg = HexStringUtils.hexString2Bytes("600000");
+            mExecutor.execute(msg);
+        }
     }
-
 
     /**写数据*/
     public void writeBytes(BleDevice bleDevice,byte[] data){
@@ -303,10 +352,38 @@ public class BleManager {
 
     private void setNotify(BleDevice  bleDevice){
         if(mBle != null){
-            mBle.startNotify(bleDevice, new BleNotiftCallback() {
+            mBle.startNotify(bleDevice, new BleNotiftCallback<BleDevice>() {
                 @Override
-                public void onChanged(Object device, BluetoothGattCharacteristic characteristic) {
-                    Log.d(TAG,"setNotify , onChanged..... " +  Arrays.toString(characteristic.getValue()));
+                public void onChanged(BleDevice device, BluetoothGattCharacteristic characteristic) {
+                    Log.d(TAG,"setNotify , onChanged..... " +  device.getBleAddress() + " ==>>> " +
+//                            Arrays.toString(characteristic.getValue())
+                            HexStringUtils.toHexString(characteristic.getValue()));
+
+
+                    final byte [] result =  characteristic.getValue();
+
+                    if(result.length > 0){
+                        byte TYPE_DATA = result[0];
+                        if(TYPE_DATA == Constant.DEVICE_STEP){
+                            byte step_1 = result[2];
+                            byte step_2 = result[3];
+                            byte step_3 = result[4];
+                            byte step_4 = result[5];
+                            int step = step_1<<24 | step_2<<16 | step_3<<8 | step_4;
+                            Log.d(TAG , " 实时步数 ==>>>> " + step);
+                        }
+
+                        else if(TYPE_DATA == Constant.DEVICE_HEART){
+
+                            byte heart = result[1];
+
+
+                            Log.d(TAG , " 实时心率 ==>>>> " +heart);
+                        }
+                    }
+
+
+
                 }
 
                 @Override
@@ -316,7 +393,7 @@ public class BleManager {
                 }
 
                 @Override
-                public void onReady(Object device) {
+                public void onReady(BleDevice device) {
                     super.onReady(device);
                     Log.d(TAG,"setNotify , onReady.....");
                 }
@@ -347,7 +424,9 @@ public class BleManager {
         @Override
         protected void onLooperPrepared() {
             super.onLooperPrepared();
-            mBleHandler = new Handler(getLooper(),mBleHandlerCallback);
+            if(mBleHandler == null){
+                mBleHandler = new Handler(getLooper(),mBleHandlerCallback);
+            }
         }
     }
 
