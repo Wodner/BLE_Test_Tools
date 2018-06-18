@@ -36,6 +36,11 @@ public class BleManager {
 
     private BleThreadExecutor mExecutor = null;
 
+    private OnStepChangedListener mOnStepChangedListener = null;
+    private OnHeartChangedListener mOnHeartChangedListener = null;
+
+
+
     public BleManager(){
         init();
     }
@@ -64,7 +69,7 @@ public class BleManager {
     }
 
 
-    /** ========================  连接与断开 ========start==================================*/
+    /* ========================  连接与断开 ========start==================================*/
 
     /**
      * @param device
@@ -231,9 +236,13 @@ public class BleManager {
     };
 
 
-    /**
-     * @return
-     */
+    /* ========================  连接与断开 ========end==================================*/
+
+
+
+
+    /* ========================  外部接口 ========start==================================*/
+
     public List<BleDevice> getConnectedDeviceLists() {
         return mConnectedLists;
     }
@@ -243,15 +252,30 @@ public class BleManager {
         void onConnected(List<BleDevice> deviceList,int size);
     }
 
-
-    /**
-     * @param listener
-     */
     public void setOnConnectListener(OnDevicesConnectListener listener){
         mOnDevicesConnectListener = listener;
     }
 
-    /** ========================  连接与断开 ========end==================================*/
+    public void setOnStepChangedListener(OnStepChangedListener listener){
+        mOnStepChangedListener = listener;
+    }
+
+    interface OnStepChangedListener{
+        void OnStepChanged(BleDevice bleDevice,int step);
+    }
+
+    public void setOnHeartChangedListener(OnHeartChangedListener listener){
+        mOnHeartChangedListener = listener;
+    }
+
+    interface OnHeartChangedListener{
+        void OnHeartChanged(BleDevice bleDevice,int heartRate);
+    }
+
+    /* ========================  外部接口 ========end==================================*/
+
+
+
 
 
 
@@ -350,16 +374,13 @@ public class BleManager {
     /**=========================  回调数据处理 ======== start ========================*/
 
 
-    private void setNotify(BleDevice  bleDevice){
+    private void setNotify(final BleDevice  bleDevice){
         if(mBle != null){
             mBle.startNotify(bleDevice, new BleNotiftCallback<BleDevice>() {
                 @Override
                 public void onChanged(BleDevice device, BluetoothGattCharacteristic characteristic) {
                     Log.d(TAG,"setNotify , onChanged..... " +  device.getBleAddress() + " ==>>> " +
-//                            Arrays.toString(characteristic.getValue())
                             HexStringUtils.toHexString(characteristic.getValue()));
-
-
                     final byte [] result =  characteristic.getValue();
 
                     if(result.length > 0){
@@ -371,19 +392,20 @@ public class BleManager {
                             byte step_4 = result[5];
                             int step = step_1<<24 | step_2<<16 | step_3<<8 | step_4;
                             Log.d(TAG , " 实时步数 ==>>>> " + step);
+
+                            if(mOnStepChangedListener != null){
+                                mOnStepChangedListener.OnStepChanged(device,step);
+                            }
                         }
 
                         else if(TYPE_DATA == Constant.DEVICE_HEART){
-
                             byte heart = result[1];
-
-
                             Log.d(TAG , " 实时心率 ==>>>> " +heart);
+                            if(mOnHeartChangedListener != null){
+                                mOnHeartChangedListener.OnHeartChanged(device,heart);
+                            }
                         }
                     }
-
-
-
                 }
 
                 @Override

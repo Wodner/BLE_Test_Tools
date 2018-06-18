@@ -4,59 +4,109 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     tools:context="com.example.wwd.bletools.MainActivity">
 
 
-
-    <Button
-        android:id="@+id/btn_connect_bles"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="连接蓝牙设备"/>
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/btn_connect_bles"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="连接蓝牙设备"/>
+        <Button
+            android:id="@+id/btn_set_motor"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="设置马达震动"/>
+
+        <Button
+            android:id="@+id/btn_sync_time"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="同步时间"/>
+
+        <Button
+            android:id="@+id/btn_get_step"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="读取实时步数"/>
+
+        <Button
+            android:id="@+id/btn_get_heart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="读取实时心率"/>
+
+        <Button
+            android:id="@+id/btn_device_recover"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="恢复出厂设置"/>
+
+        <Button
+            android:id="@+id/btn_set_off"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="关闭设备"/>
+    </LinearLayout>
 
 
-    <Button
-        android:id="@+id/btn_set_motor"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="设置马达震动"/>
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btn_sync_time"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="同步时间"/>
+        <View
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#0000ff"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#0000ff"
+            android:text="实时步数:"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#0000ff"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listview_step"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#0000ff"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#0000ff"
+            android:text="实时心率:"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#0000ff"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listview_heart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
-    <Button
-        android:id="@+id/btn_get_step"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="读取实时步数"/>
-
-    <Button
-        android:id="@+id/btn_get_heart"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="读取实时心率"/>
-
-    <Button
-        android:id="@+id/btn_device_recover"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="恢复出厂设置"/>
-
-    <Button
-        android:id="@+id/btn_set_off"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="关闭设备"/>
+    </LinearLayout>
 
 </LinearLayout>

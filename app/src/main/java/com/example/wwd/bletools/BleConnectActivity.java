@@ -78,7 +78,8 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
             mBle.turnOnBlueToothNo();
         }
         clearDevicesList();
-        checkPermission();
+//        checkPermission();
+        startRefresh();
     }
 
     @Override
