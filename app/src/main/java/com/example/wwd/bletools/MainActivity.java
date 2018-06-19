@@ -194,8 +194,8 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick({R.id.btn_connect_bles, R.id.btn_find_device, R.id.btn_check_display,
-            R.id.btn_set_off, R.id.btn_check_heart})
+    @OnClick({R.id.btn_connect_bles, R.id.btn_find_device, R.id.btn_check_display,R.id.btn_check_sensor,
+            R.id.btn_set_off, R.id.btn_check_heart,R.id.btn_check_heart_off})
     public void onViewClicked(View view) {
         mVibrator.vibrate(Constant.VIRBRATOR_TIME);
         switch (view.getId()) {
@@ -216,11 +216,13 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.btn_check_display:
-//                BleManager.getInstance().checkGsensor();
                 BleManager.getInstance().checkDisplay();
                 break;
             case R.id.btn_check_heart:
                 BleManager.getInstance().readHeart(true);
+                break;
+            case R.id.btn_check_heart_off:
+                BleManager.getInstance().readHeart(false);
                 break;
 //            case R.id.btn_get_step:
 //                readStep();
