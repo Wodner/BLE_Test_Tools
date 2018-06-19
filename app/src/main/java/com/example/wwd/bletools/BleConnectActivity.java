@@ -1,11 +1,11 @@
 package com.example.wwd.bletools;
 
 import android.Manifest;
-import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,18 +19,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.wwd.bletools.adapter.BleListAdapter;
+import com.example.wwd.bletools.app.BleManager;
+import com.example.wwd.bletools.app.Constant;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.com.heaton.blelibrary.ble.Ble;
 import cn.com.heaton.blelibrary.ble.BleDevice;
-import cn.com.heaton.blelibrary.ble.callback.BleConnCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleScanCallback;
-import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -61,12 +62,14 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
     private Ble mBle = null;
     private BleManager mBleManager = null;
 
+    private Vibrator mVibrator = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
         ButterKnife.bind(this);
+        mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         initBle();
         initView();
     }
@@ -85,7 +88,13 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
     @Override
     protected void onStop() {
         super.onStop();
-        mBle.stopScan();
+        if(mBle != null){
+            mBle.stopScan();
+        }
+        if(mBleManager != null){
+            mBleManager.unRegisterConnectListener();
+        }
+
     }
 
     private void clearDevicesList(){
@@ -179,6 +188,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
         @Override
         public void onSelected(BleDevice bleDevice, int position, boolean isCheck) {
             Log.d(TAG, isCheck + "  click : " + position);
+            mVibrator.vibrate(Constant.VIRBRATOR_TIME);
             if(mBleManager.getConnectQueen().size()>=6){
                 Toast.makeText(BleConnectActivity.this,getResources().getString(R.string.over_max_connect_devices),Toast.LENGTH_LONG).show();
                 return;
@@ -196,6 +206,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
                 }
             }
             Log.d(TAG, " queen :" + mBleManager.getConnectQueen().size());
+
         }
     };
 
@@ -260,6 +271,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
 
     @OnClick({R.id.btn_connect, R.id.btn_disconnect})
     public void onViewClicked(View view) {
+        mVibrator.vibrate(Constant.VIRBRATOR_TIME);
         switch (view.getId()) {
             case R.id.btn_connect:
                 if(mBleManager.getConnectQueen().size() > 0){

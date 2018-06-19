@@ -1,4 +1,4 @@
-package com.example.wwd.bletools;
+package com.example.wwd.bletools.app;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -6,6 +6,9 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
+
+import com.example.wwd.bletools.utils.BleThreadExecutor;
+import com.example.wwd.bletools.utils.HexStringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -248,7 +251,7 @@ public class BleManager {
     }
 
 
-    interface OnDevicesConnectListener{
+    public interface OnDevicesConnectListener{
         void onConnected(List<BleDevice> deviceList,int size);
     }
 
@@ -256,20 +259,40 @@ public class BleManager {
         mOnDevicesConnectListener = listener;
     }
 
+    public void unRegisterConnectListener(){
+        mOnDevicesConnectListener = null;
+    }
+
+
+
+
+    public interface OnStepChangedListener{
+        void OnStepChanged(BleDevice bleDevice,int step);
+    }
+
     public void setOnStepChangedListener(OnStepChangedListener listener){
         mOnStepChangedListener = listener;
     }
 
-    interface OnStepChangedListener{
-        void OnStepChanged(BleDevice bleDevice,int step);
+    public void unRegisterStepChangedListener(){
+        mOnStepChangedListener = null;
+    }
+
+
+
+
+
+
+    public interface OnHeartChangedListener{
+        void OnHeartChanged(BleDevice bleDevice,int heartRate);
     }
 
     public void setOnHeartChangedListener(OnHeartChangedListener listener){
         mOnHeartChangedListener = listener;
     }
 
-    interface OnHeartChangedListener{
-        void OnHeartChanged(BleDevice bleDevice,int heartRate);
+    public void unRegisterHeartChangedListener(){
+        mOnHeartChangedListener = null;
     }
 
     /* ========================  外部接口 ========end==================================*/
@@ -285,17 +308,35 @@ public class BleManager {
     /**=========================  给设备写数据 ======== start =========================*/
 
     /**设置马达震动*/
-    public void setVibrationMotor(){
-        Log.d(TAG,"setVibrationMotor");
+    public void findBleDevices(){
+        Log.d(TAG,"findBleDevices");
         byte [] msg = HexStringUtils.hexString2Bytes("5101");
         mExecutor.execute(msg);
     }
+
+
+
+    public void checkGsensor(){
+        Log.d(TAG,"checkGsensor");
+        byte [] msg = HexStringUtils.hexString2Bytes("AAABAC");
+        mExecutor.execute(msg);
+    }
+
+    public void checkDisplay(){
+        Log.d(TAG,"checkDisplay");
+        byte [] msg = HexStringUtils.hexString2Bytes("AAABAD73FF00313233E6B497E79086");
+        mExecutor.execute(msg);
+    }
+
 
     private final int GTM_8 = 28800;
     /**同步时间*/
     public void setSyncTime(){
         Log.d(TAG,"setSyncTime");
-        int time = (int) System.currentTimeMillis()/1000;
+        int time = (int) (System.currentTimeMillis()/1000);
+
+        Log.d(TAG,"毫秒数：" + System.currentTimeMillis() + "  总时间秒 ： " +  time);
+
         byte [] msg =  new byte[12];
         msg[0] = 0x01;
         msg[1] = (byte) ((time >> 24)& 0xff);
@@ -358,14 +399,16 @@ public class BleManager {
     public void writeBytes(BleDevice bleDevice,byte[] data){
         Log.d(TAG,"writeBytes");
         if(mBle != null){
-            mBle.write(bleDevice, data, new BleWriteCallback() {
-                @Override
-                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                    Log.d(TAG,"onWriteSuccess");
-                }
-            });
+            mBle.write(bleDevice, data, mBleDeviceBleWriteCallback);
         }
     }
+
+    private BleWriteCallback<BleDevice> mBleDeviceBleWriteCallback = new BleWriteCallback<BleDevice>() {
+        @Override
+        public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+            Log.d(TAG,"onWriteSuccess");
+        }
+    };
 
     /**=========================  给设备写数据 ======== end ========================*/
 
@@ -390,8 +433,11 @@ public class BleManager {
                             byte step_2 = result[3];
                             byte step_3 = result[4];
                             byte step_4 = result[5];
-                            int step = step_1<<24 | step_2<<16 | step_3<<8 | step_4;
-                            Log.d(TAG , " 实时步数 ==>>>> " + step);
+                            int step =((step_1<<24 & 0xff000000) | (step_2<<16 & 0x00ff0000 ) | (step_3<<8 & 0x0000ff00) | (step_4 & 0xff));
+
+                            byte[] dd = new byte[1];
+                            dd[0] = result[4];
+                            Log.d(TAG , (0x04<<8|0xf5) +" , " +  ((step_3<<8 & 0x00ff0000) | (step_4 & 0xff))+ " , " + " 实时步数 ==>>>> " + step);
 
                             if(mOnStepChangedListener != null){
                                 mOnStepChangedListener.OnStepChanged(device,step);

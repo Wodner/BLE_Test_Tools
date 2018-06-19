@@ -20,39 +20,52 @@
             android:layout_weight="1"
             android:text="连接蓝牙设备"/>
         <Button
-            android:id="@+id/btn_set_motor"
+            android:id="@+id/btn_find_device"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="设置马达震动"/>
+            android:text="查找手环设备"/>
 
         <Button
-            android:id="@+id/btn_sync_time"
+            android:id="@+id/btn_check_sensor"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="同步时间"/>
-
+            android:text="检查传感器"/>
         <Button
-            android:id="@+id/btn_get_step"
+            android:id="@+id/btn_check_display"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="读取实时步数"/>
+            android:text="屏幕显示检查"/>
 
-        <Button
-            android:id="@+id/btn_get_heart"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="读取实时心率"/>
+        <!--<Button-->
+            <!--android:id="@+id/btn_sync_time"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="同步时间"/>-->
 
-        <Button
-            android:id="@+id/btn_device_recover"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="恢复出厂设置"/>
+        <!--<Button-->
+            <!--android:id="@+id/btn_get_step"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="读取实时步数"/>-->
+
+        <!--<Button-->
+            <!--android:id="@+id/btn_get_heart"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="读取实时心率"/>-->
+
+        <!--<Button-->
+            <!--android:id="@+id/btn_device_recover"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="恢复出厂设置"/>-->
 
         <Button
             android:id="@+id/btn_set_off"
@@ -63,50 +76,50 @@
     </LinearLayout>
 
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
+    <!--<LinearLayout-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_weight="1"-->
+        <!--android:orientation="vertical">-->
 
-        <View
-            android:layout_marginTop="5dp"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#0000ff"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#0000ff"
-            android:text="实时步数:"/>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#0000ff"/>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/listview_step"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#0000ff"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#0000ff"
-            android:text="实时心率:"/>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#0000ff"/>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/listview_heart"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
+        <!--<View-->
+            <!--android:layout_marginTop="5dp"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:background="#0000ff"/>-->
+        <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="#0000ff"-->
+            <!--android:text="实时步数:"/>-->
+        <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:background="#0000ff"/>-->
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/listview_step"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_weight="1"/>-->
+        <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:background="#0000ff"/>-->
+        <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="#0000ff"-->
+            <!--android:text="实时心率:"/>-->
+        <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:background="#0000ff"/>-->
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/listview_heart"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_weight="1"/>-->
 
-    </LinearLayout>
+    <!--</LinearLayout>-->
 
 </LinearLayout>

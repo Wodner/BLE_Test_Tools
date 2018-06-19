@@ -1,4 +1,4 @@
-package com.example.wwd.bletools;
+package com.example.wwd.bletools.utils;
 
 public class HexStringUtils {
 

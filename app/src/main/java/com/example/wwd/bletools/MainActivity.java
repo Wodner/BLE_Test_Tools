@@ -3,15 +3,17 @@ package com.example.wwd.bletools;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
-import butterknife.BindView;
+import com.example.wwd.bletools.adapter.DataAdapter;
+import com.example.wwd.bletools.app.BleManager;
+import com.example.wwd.bletools.app.Constant;
+
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -20,10 +22,20 @@ import butterknife.OnClick;
  */
 public class MainActivity extends AppCompatActivity {
 
-    @BindView(R.id.listview_step)
-    RecyclerView mListviewStep;
-    @BindView(R.id.listview_heart)
-    RecyclerView mLstviewHeart;
+    private final String TAG = MainActivity.class.getName();
+
+//    @BindView(R.id.listview_step)
+//    RecyclerView mListviewStep;
+//    @BindView(R.id.listview_heart)
+//    RecyclerView mLstviewHeart;
+
+    private DataAdapter mStepAdapter = null;
+    private DataAdapter mHeartAdapter = null;
+
+//    private List<BleDataMode> mBleStepModeList = new ArrayList<>();
+//    private List<BleDataMode> mBleHeartModeList = new ArrayList<>();
+
+    private Vibrator mVibrator = null;
 
 
     @Override
@@ -41,45 +53,180 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+//        //设置RecyclerView管理器
+//        mListviewStep.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+//        //初始化适配器
+//        mStepAdapter = new DataAdapter(this);
+//        //设置添加或删除item时的动画，这里使用默认动画
+//        mListviewStep.setItemAnimator(new DefaultItemAnimator());
+//        //设置适配器
+//        mListviewStep.setAdapter(mStepAdapter);
+//        mStepAdapter.setData(mBleStepModeList);
+//
+//        //设置RecyclerView管理器
+//        mLstviewHeart.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+//        //初始化适配器
+//        mHeartAdapter = new DataAdapter(this);
+//        //设置添加或删除item时的动画，这里使用默认动画
+//        mLstviewHeart.setItemAnimator(new DefaultItemAnimator());
+//        //设置适配器
+//        mLstviewHeart.setAdapter(mHeartAdapter);
+//        mHeartAdapter.setData(mBleHeartModeList);
     }
 
+
+//    private boolean isContainsStep = false;
+//    private boolean isContainsHeart = false;
+//    private BleManager.OnStepChangedListener mOnStepChangedListener = new BleManager.OnStepChangedListener() {
+//        @Override
+//        public void OnStepChanged(BleDevice bleDevice, int step) {
+//            String mac = bleDevice.getBleAddress();
+//            if(mBleStepModeList.size()==0){
+//                BleDataMode bleDataMode = new BleDataMode(bleDevice.getBleAddress(),bleDevice.getBleName(),step);
+//                mBleStepModeList.add(bleDataMode);
+//            }else{
+//                isContainsStep = false;
+//                for(int i=0;i<mBleStepModeList.size();i++){
+//                    Log.d(TAG,(!mBleStepModeList.get(i).getmMac().equals(mac)) +" <<<<=== >>>> " + mBleStepModeList.get(i).getmMac() + " == " +mac);
+//                    if(mBleStepModeList.get(i).getmMac().equals(mac)){
+//                        isContainsStep = true;
+//                        break;
+//                    }
+//                }
+//                if(!isContainsStep){
+//                    BleDataMode bleDataMode_1 = new BleDataMode(bleDevice.getBleAddress(),bleDevice.getBleName(),step);
+//                    mBleStepModeList.add(bleDataMode_1);
+//                }
+//            }
+//            Log.d(TAG," step count === >>>> " + mBleStepModeList.size());
+//            if(mHandler != null){
+//                mHandler.sendEmptyMessage(MSG_UPDATE_STEP);
+//            }
+//        }
+//    };
+//
+//    private BleManager.OnHeartChangedListener mOnHeartChangedListener = new BleManager.OnHeartChangedListener() {
+//        @Override
+//        public void OnHeartChanged(BleDevice bleDevice, int heartRate) {
+//            String mac = bleDevice.getBleAddress();
+//            if(mBleHeartModeList.size()==0){
+//                BleDataMode bleDataMode = new BleDataMode(bleDevice.getBleAddress(),bleDevice.getBleName(),heartRate);
+//                mBleHeartModeList.add(bleDataMode);
+//            }else{
+//                isContainsHeart = false;
+//                for(int i=0;i<mBleHeartModeList.size();i++){
+//                    Log.d(TAG,(!mBleHeartModeList.get(i).getmMac().equals(mac)) +" <<<<=== >>>> " + mBleHeartModeList.get(i).getmMac() + " == " +mac);
+//                    if(mBleHeartModeList.get(i).getmMac().equals(mac)){
+//                        isContainsHeart = true;
+//                        break;
+//                    }
+//                }
+//                if(!isContainsHeart){
+//                    BleDataMode bleDataMode_1 = new BleDataMode(bleDevice.getBleAddress(),bleDevice.getBleName(),heartRate);
+//                    mBleHeartModeList.add(bleDataMode_1);
+//                }
+//            }
+//            Log.d(TAG," heart count === >>>> " + mBleHeartModeList.size());
+//            if(mHandler != null){
+//                mHandler.sendEmptyMessage(MSG_UPDATE_HEART);
+//            }
+//        }
+//    };
+
+
+
+//    private final int MSG_UPDATE_STEP  = 100;
+//    private final int MSG_UPDATE_HEART = 101;
+//
+//    private Handler mHandler = new Handler(){
+//
+//        @Override
+//        public void handleMessage(Message msg) {
+//            super.handleMessage(msg);
+//            switch (msg.what){
+//                case MSG_UPDATE_STEP:
+//                    updateStepList();
+//                    break;
+//                case MSG_UPDATE_HEART:
+//                    updataHeartList();
+//                    break;
+//            }
+//        }
+//    };
+
+//    private void updateStepList(){
+//        if(mStepAdapter != null){
+//            mStepAdapter.setData(mBleStepModeList);
+//        }
+//    }
+//
+//    private void updataHeartList(){
+//        if(mHeartAdapter != null){
+//            mHeartAdapter.setData(mBleHeartModeList);
+//        }
+//    }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        BleManager.getInstance().setOnStepChangedListener(mOnStepChangedListener);
+//        BleManager.getInstance().setOnHeartChangedListener(mOnHeartChangedListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        BleManager.getInstance().unRegisterHeartChangedListener();
+//        BleManager.getInstance().unRegisterStepChangedListener();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                mVibrator.vibrate(Constant.VIRBRATOR_TIME);
                 this.finish(); // back button
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick({R.id.btn_connect_bles, R.id.btn_set_motor, R.id.btn_sync_time, R.id.btn_set_off,
-            R.id.btn_get_step, R.id.btn_get_heart, R.id.btn_device_recover})
+    @OnClick({R.id.btn_connect_bles, R.id.btn_find_device, R.id.btn_check_sensor, R.id.btn_check_display,
+            R.id.btn_set_off})
     public void onViewClicked(View view) {
+        mVibrator.vibrate(Constant.VIRBRATOR_TIME);
         switch (view.getId()) {
             case R.id.btn_connect_bles:
                 BleConnectActivity.startAction(this, null);
                 break;
-            case R.id.btn_set_motor:
-                BleManager.getInstance().setVibrationMotor();
+            case R.id.btn_find_device:
+                BleManager.getInstance().findBleDevices();
                 break;
-            case R.id.btn_sync_time:
-                BleManager.getInstance().setSyncTime();
-                break;
+//            case R.id.btn_sync_time:
+//                BleManager.getInstance().setSyncTime();
+//                break;
             case R.id.btn_set_off:
                 setDeivcePowerOff();
                 break;
+            case R.id.btn_check_sensor:
+                BleManager.getInstance().checkGsensor();
+                break;
 
-            case R.id.btn_get_step:
-                readStep();
+            case R.id.btn_check_display:
+                BleManager.getInstance().checkDisplay();
                 break;
-            case R.id.btn_get_heart:
-                readHeart();
-                break;
-            case R.id.btn_device_recover:
-                setDeviceRecovery();
-                break;
+//            case R.id.btn_get_step:
+//                readStep();
+//                break;
+//            case R.id.btn_get_heart:
+//                readHeart();
+//                break;
+//            case R.id.btn_device_recover:
+//                setDeviceRecovery();
+//                break;
         }
     }
 
@@ -93,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                 BleManager.getInstance().readStep(false);
                 ;//5s后停止测试
             }
-        }, 3000);
+        }, 5000);
     }
 
     private void readHeart() {

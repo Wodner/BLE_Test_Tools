@@ -1,6 +1,8 @@
-package com.example.wwd.bletools;
+package com.example.wwd.bletools.utils;
 
 import android.util.Log;
+
+import com.example.wwd.bletools.app.BleManager;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Semaphore;
