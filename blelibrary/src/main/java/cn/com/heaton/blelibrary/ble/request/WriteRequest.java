@@ -41,7 +41,9 @@ public class WriteRequest<T extends BleDevice> implements IMessage {
             case BleStates.BleStatus.Write:
                 if(msg.obj instanceof BluetoothGattCharacteristic){
                     BluetoothGattCharacteristic characteristic = (BluetoothGattCharacteristic) msg.obj;
-                    mBleLisenter.onWriteSuccess(characteristic);
+                    if(mBleLisenter != null){
+                        mBleLisenter.onWriteSuccess(characteristic);
+                    }
                 }
                 break;
             default:

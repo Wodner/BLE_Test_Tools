@@ -13,31 +13,40 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_margin="3dp"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/shuoming"/>
+
         <Button
             android:id="@+id/btn_connect_bles"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="连接蓝牙设备"/>
+            android:text="一、连接蓝牙设备"/>
         <Button
             android:id="@+id/btn_find_device"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="查找手环设备"/>
+            android:text="二、查找手环设备"/>
 
         <Button
             android:id="@+id/btn_check_sensor"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="检查传感器"/>
+            android:text="三、检查GSENSOR"/>
         <Button
             android:id="@+id/btn_check_display"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="屏幕显示检查"/>
+            android:text="三、检查屏幕显示"/>
 
         <!--<Button-->
             <!--android:id="@+id/btn_sync_time"-->
@@ -66,13 +75,19 @@
             <!--android:layout_height="0dp"-->
             <!--android:layout_weight="1"-->
             <!--android:text="恢复出厂设置"/>-->
+        <Button
+            android:id="@+id/btn_check_heart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="四、心率控制测试"/>
 
         <Button
             android:id="@+id/btn_set_off"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="关闭设备"/>
+            android:text="五、关闭手环设备"/>
     </LinearLayout>
 
 

@@ -379,7 +379,6 @@ public class BleManager {
             byte [] msg = HexStringUtils.hexString2Bytes("3100");
             mExecutor.execute(msg);
         }
-
     }
 
 

@@ -10,4 +10,6 @@
 
     <string name="connect_ble_device">连接手环</string>
 
+    <string name="shuoming">说明：测试工具按照以下按键序号进行测试，第四步骤中检查屏幕显示要先执行第三步骤，如有异常将显示白屏.</string>>
+
 </resources>
