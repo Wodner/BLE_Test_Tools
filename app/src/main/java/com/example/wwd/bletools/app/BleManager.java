@@ -135,7 +135,7 @@ public class BleManager {
     }
 
     private void connect(){
-        clearConenctedDevices();
+//        clearConenctedDevices();
         if(mBleConnectDeviceQueues != null && mBleConnectDeviceQueues.size()>0){
             triggerConnectNextDevice();
         }else{

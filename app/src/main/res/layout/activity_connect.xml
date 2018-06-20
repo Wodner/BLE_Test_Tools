@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:text="断开"/>
+            android:text="恢复设置"/>
 
     </LinearLayout>
 
