@@ -1,6 +1,8 @@
 package com.example.wwd.bletools;
 
+import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -9,8 +11,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
-import com.example.wwd.bletools.adapter.DataAdapter;
 import com.example.wwd.bletools.app.BleManager;
 import com.example.wwd.bletools.app.Constant;
 
@@ -29,8 +31,11 @@ public class MainActivity extends AppCompatActivity {
 //    @BindView(R.id.listview_heart)
 //    RecyclerView mLstviewHeart;
 
-    private DataAdapter mStepAdapter = null;
-    private DataAdapter mHeartAdapter = null;
+    private Activity mContext = null;
+    private final int  REQUEST_CODE = 100;
+
+//    private DataAdapter mStepAdapter = null;
+//    private DataAdapter mHeartAdapter = null;
 
 //    private List<BleDataMode> mBleStepModeList = new ArrayList<>();
 //    private List<BleDataMode> mBleHeartModeList = new ArrayList<>();
@@ -42,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = this;
         ButterKnife.bind(this);
         initView();
     }
@@ -200,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
         mVibrator.vibrate(Constant.VIRBRATOR_TIME);
         switch (view.getId()) {
             case R.id.btn_connect_bles:
-                BleConnectActivity.startAction(this, null);
+                BleConnectActivity.startAction(mContext, null,REQUEST_CODE);
                 break;
             case R.id.btn_find_device:
                 BleManager.getInstance().findBleDevices();
@@ -233,6 +239,17 @@ public class MainActivity extends AppCompatActivity {
 //            case R.id.btn_device_recover:
 //                setDeviceRecovery();
 //                break;
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            Toast.makeText(mContext,"连接设备完成",Toast.LENGTH_LONG).show();
+        }else if(resultCode == RESULT_CANCELED){
+            Toast.makeText(mContext,"设备尚未连接",Toast.LENGTH_LONG).show();
         }
     }
 

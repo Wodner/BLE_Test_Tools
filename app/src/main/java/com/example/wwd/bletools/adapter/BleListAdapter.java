@@ -52,17 +52,14 @@ public class BleListAdapter extends RecyclerView.Adapter<BleListAdapter.MyViewHo
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         holder.tvMac.setText(mDeviceList.get(position).getBleName()  + "\n" + mDeviceList.get(position).getBleAddress());
-//        if(mDeviceList.get(position).isConnected()){
-//            holder.checkBox.setEnabled(false);
-//        }else{
-//            holder.checkBox.setEnabled(true);
-//        }
         holder.checkBox.setChecked(false);
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(mListCheckBoxSelectorListener != null){
-                    mListCheckBoxSelectorListener .onSelected(mDeviceList.get(position), position ,isChecked);
+                    if(mDeviceList.size()>=position){
+                        mListCheckBoxSelectorListener .onSelected(mDeviceList.get(position), position ,isChecked);
+                    }
                 }
             }
         });
