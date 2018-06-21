@@ -46,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="三、检查屏幕显示"/>
+            android:text="四、检查屏幕显示"/>
 
         <!--<Button-->
             <!--android:id="@+id/btn_sync_time"-->
@@ -80,20 +80,27 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="四、心率控制测试"/>
+            android:text="五、心率控制测试"/>
         <Button
             android:id="@+id/btn_check_heart_off"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="五、关闭心率测试"/>
+            android:text="六、关闭心率测试"/>
+
+        <Button
+            android:id="@+id/btn_device_recover"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="七、恢复出厂设置"/>
 
         <Button
             android:id="@+id/btn_set_off"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="六、关闭手环设备"/>
+            android:text="八、关闭手环设备"/>
     </LinearLayout>
 
 

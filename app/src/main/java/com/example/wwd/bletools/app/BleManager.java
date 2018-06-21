@@ -154,6 +154,7 @@ public class BleManager {
     }
 
     private void disconnect(){
+//        getConnectedDeviceLists();
         for(int i=0; i< mConnectedLists.size(); i++){
             addDeviceToDisconnectQueue(mConnectedLists.get(i));
         }
@@ -231,9 +232,9 @@ public class BleManager {
         public void onConnectException(BleDevice device, int errorCode) {
             super.onConnectException(device, errorCode);
             Log.e( TAG,"onConnectException : " + errorCode);
-            if(mConnectedLists.contains(device)){
-                mConnectedLists.remove(device);
-            }
+//            if(mConnectedLists.contains(device)){
+//                mConnectedLists.remove(device);
+//            }
             triggerConnectNextDevice();
         }
     };
@@ -247,6 +248,7 @@ public class BleManager {
     /* ========================  外部接口 ========start==================================*/
 
     public List<BleDevice> getConnectedDeviceLists() {
+        Log.d(TAG," DDDDD " + mConnectedLists.size());
         return mConnectedLists;
     }
 

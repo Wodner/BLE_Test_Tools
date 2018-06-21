@@ -30,9 +30,17 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:text="连接"/>
-
         <Button
             android:id="@+id/btn_disconnect"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:text="断开"/>
+
+        <Button
+            android:id="@+id/btn_reset"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

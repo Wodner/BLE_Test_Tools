@@ -117,10 +117,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
             switch(msg.what){
                 case MSG_CHECK_CONNECT_STATE:
                     mProcessbar.setVisibility(View.GONE);
-                    if(mTotalConnectDevices != mBleManager.getConnectedDeviceLists().size()){
-                        Toast.makeText(BleConnectActivity.this, "连接失败，请重新扫描设备并连接。", Toast.LENGTH_LONG).show();
-                        startRefresh();
-                    }
+                        Toast.makeText(BleConnectActivity.this, "已连接设备数：" + mBleManager.getConnectedDeviceLists().size(), Toast.LENGTH_SHORT).show();
                     break;
                 case MSG_CLEAR_CACHE :
                     mBle.turnOnBlueToothNo();
@@ -141,8 +138,8 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
 
     public static void startAction(Activity context, Bundle bundle, int requestCode) {
         Intent intent = new Intent(context, BleConnectActivity.class);
-//        context.startActivity(intent);
-        context.startActivityForResult(intent, requestCode);
+        context.startActivity(intent);
+//        context.startActivityForResult(intent, requestCode);
     }
 
 
@@ -175,12 +172,17 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
             @Override
             public void onConnected(List<BleDevice> deviceList, int size) {
                 Log.d(TAG, "连接设备数 ： " + size);
+
                 if (mTotalConnectDevices == size) {
                     mBleManager.clearConnectQueue();
                     mProcessbar.setVisibility(View.GONE);
-                    Intent intent = getIntent();
-                    setResult(RESULT_OK, intent);
-                    finish();
+//                    Intent intent = getIntent();
+//                    setResult(RESULT_OK, intent);
+//                    finish();
+                    removeMsg();
+                    Toast.makeText(BleConnectActivity.this, "已连接完成，请返回。", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(BleConnectActivity.this, "连接设备数 ： " + size, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -233,7 +235,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
             Log.d(TAG, isCheck + "  click : " + position);
             mVibrator.vibrate(Constant.VIRBRATOR_TIME);
             if (mBleManager.getConnectQueen().size() >= 6) {
-                Toast.makeText(BleConnectActivity.this, getResources().getString(R.string.over_max_connect_devices), Toast.LENGTH_LONG).show();
+                Toast.makeText(BleConnectActivity.this, getResources().getString(R.string.over_max_connect_devices), Toast.LENGTH_SHORT).show();
                 return;
             } else {
                 if (isCheck) {
@@ -262,9 +264,22 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (!mDevicesList.contains(device)) {
+                        boolean isContains = false;
+                        Log.d(TAG,mDevicesList.size() + "  DDDDDDDD : " + device.getBleAddress());
+                        if(mDevicesList.size() == 0){
                             mDevicesList.add(device);
                             mBleListAdapter.setData(mDevicesList);
+                        }else{
+                            for(int i=0;i<mDevicesList.size();i++){
+                                if(mDevicesList.get(i).getBleAddress().equals(device.getBleAddress())){
+                                    isContains = true;
+                                    break;
+                                }
+                            }
+                            if(!isContains){
+                                mDevicesList.add(device);
+                                mBleListAdapter.setData(mDevicesList);
+                            }
                         }
                     }
                 });
@@ -332,18 +347,22 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
                     mTotalConnectDevices = mBleManager.getConnectQueen().size();
                     mHandler.sendEmptyMessageDelayed(MSG_CHECK_CONNECT_STATE,12000);
                 } else {
-                    Toast.makeText(BleConnectActivity.this, "请先选择要连接的设备", Toast.LENGTH_LONG).show();
+                    Toast.makeText(BleConnectActivity.this, "请先选择要连接的设备", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btn_disconnect:
+                mBleManager.clearConnectQueue();
+                if (mBleManager.getConnectedDeviceLists().size() > 0) {
+                    mTotalConnectDevices = mBleManager.getConnectQueen().size();
+                    mBleManager.startDisConnect();
+                    mBleListAdapter.setData(mDevicesList);
+                } else {
+                    Toast.makeText(BleConnectActivity.this, "当前没有连接设备", Toast.LENGTH_SHORT).show();
+                }
 
-//                if (mBleManager.getConnectedDeviceLists().size() > 0) {
-//                    mTotalConnectDevices = mBleManager.getConnectQueen().size();
-//                    mBleManager.startDisConnect();
-//                    mBleListAdapter.setData(mDevicesList);
-//                } else {
-//                    Toast.makeText(BleConnectActivity.this, "当前没有连接设备", Toast.LENGTH_LONG).show();
-//                }
+                break;
+
+            case R.id.btn_reset:
                 clear();
                 mProcessbar.setVisibility(View.VISIBLE);
                 break;
@@ -358,9 +377,7 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
         mBleListAdapter.setData(mDevicesList);
         mBleManager.clearConnectQueue();
         mBleManager.startDisConnect();
-
         mBle.turnOffBlueTooth();
-
         mHandler.sendEmptyMessageDelayed(MSG_CLEAR_CACHE,3000);
     }
 
@@ -369,8 +386,11 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = getIntent();
-                setResult(RESULT_CANCELED, intent);
+//                Intent intent = getIntent();
+//                setResult(RESULT_CANCELED, intent);
+                if(mBleManager != null){
+                    mBleManager.clearConnectQueue();
+                }
                 this.finish(); // back button
                 if(mHandler != null){
                     mHandler.removeMessages(MSG_CHECK_CONNECT_STATE);
@@ -378,5 +398,16 @@ public class BleConnectActivity extends AppCompatActivity implements EasyPermiss
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(mBleManager != null){
+            mBleManager.clearConnectQueue();
+        }
+        if(mHandler != null){
+            mHandler.removeMessages(MSG_CHECK_CONNECT_STATE);
+        }
     }
 }

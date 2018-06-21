@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @OnClick({R.id.btn_connect_bles, R.id.btn_find_device, R.id.btn_check_display,R.id.btn_check_sensor,
-            R.id.btn_set_off, R.id.btn_check_heart,R.id.btn_check_heart_off})
+            R.id.btn_set_off, R.id.btn_check_heart,R.id.btn_check_heart_off,R.id.btn_device_recover})
     public void onViewClicked(View view) {
         mVibrator.vibrate(Constant.VIRBRATOR_TIME);
         switch (view.getId()) {
@@ -236,9 +236,9 @@ public class MainActivity extends AppCompatActivity {
 //            case R.id.btn_get_heart:
 //                readHeart();
 //                break;
-//            case R.id.btn_device_recover:
-//                setDeviceRecovery();
-//                break;
+            case R.id.btn_device_recover:
+                setDeviceRecovery();
+                break;
         }
     }
 
